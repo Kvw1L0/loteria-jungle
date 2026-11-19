@@ -44,63 +44,18 @@
       z-index: 0;
     }
 
-    /* Top JUNGLE Logo Banner (never covered by the tombola) */
-    .jungle-header {
+    /* Top JUNGLE Logo (black-filled PNG with crisp yellow edge) */
+    .jungle-logo {
       position: relative;
       z-index: 3;
-      width: min(380px, 72vw);
-      height: clamp(72px, 11vh, 108px);
-      background: url('fondo-jungle.jpg') no-repeat center 14.5%;
-      background-size: 165% auto;
-      border-radius: 18px;
-      mix-blend-mode: lighten;
+      width: min(320px, 64vw);
+      height: auto;
+      max-height: 92px;
+      object-fit: contain;
       flex-shrink: 0;
+      margin-top: 6px;
       margin-bottom: 4px;
-    }
-
-    .top-controls {
-      position: fixed;
-      top: 14px;
-      right: 16px;
-      z-index: 20;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .counter-pill {
-      background: rgba(15, 15, 15, 0.85);
-      color: #ffffff;
-      border: 2px solid rgba(255, 213, 0, 0.65);
-      border-radius: 999px;
-      padding: 8px 14px;
-      font-size: 0.95rem;
-      letter-spacing: 0.5px;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
-    }
-
-    .btn-control {
-      background: rgba(15, 15, 15, 0.85);
-      color: #ffd500;
-      border: 2px solid #ffd500;
-      border-radius: 999px;
-      padding: 8px 16px;
-      font-family: 'Luckiest Guy', cursive;
-      font-size: 0.95rem;
-      letter-spacing: 0.5px;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
-      transition: transform 0.14s ease, background-color 0.2s ease, color 0.2s ease;
-    }
-
-    .btn-control:hover {
-      background: #ffd500;
-      color: #111111;
-      transform: translateY(-1px);
-    }
-
-    .btn-control:active {
-      transform: scale(0.95);
+      filter: drop-shadow(0 0 2px #ffd500) drop-shadow(0 0 10px rgba(255, 213, 0, 0.78));
     }
 
     .stage {
@@ -113,14 +68,14 @@
       width: 100%;
       max-width: 980px;
       flex: 1;
-      margin: 6px 0 12px;
+      margin: 4px 0 10px;
     }
 
-    /* Giant Circular Tombola Drum */
+    /* Giant Circular Tombola Drum (+45% larger) */
     .drum-wrapper {
       position: relative;
-      width: min(68vw, 52vh, 420px);
-      height: min(68vw, 52vh, 420px);
+      width: min(86vw, 66vh, 610px);
+      height: min(86vw, 66vh, 610px);
       border-radius: 50%;
       padding: 13px;
       background: conic-gradient(
@@ -312,17 +267,12 @@
   </style>
 </head>
 <body>
-  <header class="jungle-header" aria-label="JUNGLE"></header>
-
-  <div class="top-controls">
-    <div class="counter-pill" id="historyCount">0 / 20</div>
-    <button class="btn-control" type="button" id="resetBtn">Reiniciar</button>
-  </div>
+  <img src="logo-jungle.png" alt="JUNGLE" class="jungle-logo" />
 
   <main class="stage">
     <div class="drum-wrapper" id="drumWrapper" title="Presiona Espacio o haz clic para sacar una bolita">
       <div class="drum-inner">
-        <canvas id="drumCanvas" width="440" height="440"></canvas>
+        <canvas id="drumCanvas" width="600" height="600"></canvas>
       </div>
     </div>
   </main>
@@ -345,14 +295,12 @@
     const ctx = canvas.getContext('2d');
     const drumWrapper = document.getElementById('drumWrapper');
     const historyGrid = document.getElementById('historyGrid');
-    const historyCount = document.getElementById('historyCount');
     const spotlight = document.getElementById('spotlight');
     const spotlightBall = document.getElementById('spotlightBall');
-    const resetBtn = document.getElementById('resetBtn');
 
     const CENTER = canvas.width / 2;
-    const DRUM_RADIUS = canvas.width / 2 - 10;
-    const BALL_RADIUS = 22;
+    const DRUM_RADIUS = canvas.width / 2 - 14;
+    const BALL_RADIUS = 28;
     const GRAVITY = 0.23;
     const RESTITUTION = 0.84;
     const WALL_RESTITUTION = 0.78;
@@ -588,7 +536,7 @@
         ctx.translate(b.x, b.y);
         ctx.rotate(Math.sin(b.rot) * 0.22);
         ctx.fillStyle = b.style.text;
-        ctx.font = '21px "Luckiest Guy", cursive';
+        ctx.font = '26px "Luckiest Guy", cursive';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(String(b.num), 0, 2);
@@ -614,7 +562,6 @@
     }
 
     function renderHistory() {
-      historyCount.textContent = `${drawnNumbers.length} / ${TOTAL_BALLS}`;
       historyGrid.innerHTML = '';
 
       // Always display drawn balls in ascending ordinal order (1 to 20)
@@ -728,7 +675,6 @@
     });
 
     drumWrapper.addEventListener('click', drawNextBall);
-    resetBtn.addEventListener('click', resetTombola);
 
     createBalls();
     renderHistory();
