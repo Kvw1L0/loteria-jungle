@@ -44,18 +44,27 @@
       z-index: 0;
     }
 
-    /* Top JUNGLE Logo (black-filled PNG with crisp yellow edge) */
+    /* Top JUNGLE Logo (black-filled PNG with solid yellow outline) */
     .jungle-logo {
       position: relative;
       z-index: 3;
-      width: min(320px, 64vw);
+      width: min(432px, 78vw);
       height: auto;
-      max-height: 92px;
+      max-height: 124px;
       object-fit: contain;
       flex-shrink: 0;
       margin-top: 6px;
-      margin-bottom: 4px;
-      filter: drop-shadow(0 0 2px #ffd500) drop-shadow(0 0 10px rgba(255, 213, 0, 0.78));
+      margin-bottom: 6px;
+      filter:
+        drop-shadow(2px 0 0 #ffd500)
+        drop-shadow(-2px 0 0 #ffd500)
+        drop-shadow(0 2px 0 #ffd500)
+        drop-shadow(0 -2px 0 #ffd500)
+        drop-shadow(2px 2px 0 #ffd500)
+        drop-shadow(-2px -2px 0 #ffd500)
+        drop-shadow(2px -2px 0 #ffd500)
+        drop-shadow(-2px 2px 0 #ffd500)
+        drop-shadow(0 0 10px rgba(255, 213, 0, 0.55));
     }
 
     .stage {
@@ -74,8 +83,8 @@
     /* Giant Circular Tombola Drum (+45% larger) */
     .drum-wrapper {
       position: relative;
-      width: min(86vw, 66vh, 610px);
-      height: min(86vw, 66vh, 610px);
+      width: min(86vw, 62vh, 610px);
+      height: min(86vw, 62vh, 610px);
       border-radius: 50%;
       padding: 13px;
       background: conic-gradient(
