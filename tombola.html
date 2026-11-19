@@ -27,8 +27,8 @@
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
-      padding: clamp(74px, 12vh, 115px) 20px 22px;
-      background: #0b0b0b url('fondo-jungle.jpg') no-repeat center top fixed;
+      padding: 10px 20px 22px;
+      background: #0a0a0a url('fondo-jungle.jpg') no-repeat center 72% fixed;
       background-size: cover;
       position: relative;
       overflow-x: hidden;
@@ -39,9 +39,23 @@
       content: "";
       position: fixed;
       inset: 0;
-      background: radial-gradient(circle at 50% 45%, rgba(0, 0, 0, 0.28) 0%, rgba(0, 0, 0, 0.68) 100%);
+      background: radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.22) 0%, rgba(0, 0, 0, 0.65) 100%);
       pointer-events: none;
       z-index: 0;
+    }
+
+    /* Top JUNGLE Logo Banner (never covered by the tombola) */
+    .jungle-header {
+      position: relative;
+      z-index: 3;
+      width: min(380px, 72vw);
+      height: clamp(72px, 11vh, 108px);
+      background: url('fondo-jungle.jpg') no-repeat center 14.5%;
+      background-size: 165% auto;
+      border-radius: 18px;
+      mix-blend-mode: lighten;
+      flex-shrink: 0;
+      margin-bottom: 4px;
     }
 
     .top-controls {
@@ -52,6 +66,17 @@
       display: flex;
       gap: 10px;
       align-items: center;
+    }
+
+    .counter-pill {
+      background: rgba(15, 15, 15, 0.85);
+      color: #ffffff;
+      border: 2px solid rgba(255, 213, 0, 0.65);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 0.95rem;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
     }
 
     .btn-control {
@@ -88,16 +113,16 @@
       width: 100%;
       max-width: 980px;
       flex: 1;
-      gap: 18px;
+      margin: 6px 0 12px;
     }
 
     /* Giant Circular Tombola Drum */
     .drum-wrapper {
       position: relative;
-      width: min(74vw, 430px);
-      height: min(74vw, 430px);
+      width: min(68vw, 52vh, 420px);
+      height: min(68vw, 52vh, 420px);
       border-radius: 50%;
-      padding: 14px;
+      padding: 13px;
       background: conic-gradient(
         from 0deg,
         #ffd500,
@@ -119,10 +144,10 @@
 
     .drum-wrapper.spinning {
       box-shadow:
-        0 0 55px rgba(255, 213, 0, 0.7),
+        0 0 60px rgba(255, 213, 0, 0.78),
         0 20px 55px rgba(0, 0, 0, 0.9),
         inset 0 0 18px rgba(0, 0, 0, 0.8);
-      transform: scale(1.02);
+      transform: scale(1.025);
     }
 
     .drum-inner {
@@ -130,10 +155,10 @@
       width: 100%;
       height: 100%;
       border-radius: 50%;
-      background: radial-gradient(circle at 32% 28%, rgba(48, 48, 48, 0.72), rgba(10, 10, 10, 0.92) 72%);
+      background: radial-gradient(circle at 32% 28%, rgba(44, 44, 44, 0.74), rgba(8, 8, 8, 0.94) 74%);
       border: 4px solid #111111;
       overflow: hidden;
-      box-shadow: inset 0 12px 35px rgba(0, 0, 0, 0.9);
+      box-shadow: inset 0 12px 35px rgba(0, 0, 0, 0.92);
     }
 
     /* Glass shine overlay */
@@ -157,111 +182,58 @@
       display: block;
     }
 
-    .prompt-bar {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      background: rgba(12, 12, 12, 0.84);
-      border: 2px solid rgba(255, 213, 0, 0.7);
-      border-radius: 999px;
-      padding: 8px 20px;
-      font-size: clamp(0.95rem, 2.2vw, 1.15rem);
-      letter-spacing: 0.6px;
-      color: #fff6c2;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
-    }
-
-    .prompt-bar kbd {
-      background: #ffd500;
-      color: #111111;
-      padding: 3px 12px;
-      border-radius: 8px;
-      font-family: 'Luckiest Guy', cursive;
-      box-shadow: 0 3px 0 #b38600;
-    }
-
-    /* History Tray Under Tombola */
+    /* History Tray Under Tombola (Clean, no title text, ordinal 1..20) */
     .history-section {
       position: relative;
       z-index: 2;
       width: 100%;
       max-width: 960px;
-      background: rgba(12, 12, 12, 0.86);
+      background: rgba(12, 12, 12, 0.84);
       border: 3px solid #ffd500;
       border-radius: 22px;
-      padding: 14px 20px 18px;
+      padding: 14px 18px;
       box-shadow: 0 12px 32px rgba(0, 0, 0, 0.75), 0 0 20px rgba(255, 213, 0, 0.16);
       backdrop-filter: blur(6px);
-    }
-
-    .history-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
-      padding-bottom: 8px;
-      border-bottom: 2px dashed rgba(255, 213, 0, 0.35);
-    }
-
-    .history-title {
-      font-size: clamp(1.1rem, 2.5vw, 1.35rem);
-      color: #ffd500;
-      letter-spacing: 0.8px;
-      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
-    }
-
-    .history-count {
-      font-size: clamp(1rem, 2.2vw, 1.2rem);
-      color: #ffffff;
-      background: rgba(255, 213, 0, 0.18);
-      border: 1.5px solid #ffd500;
-      border-radius: 999px;
-      padding: 3px 14px;
     }
 
     .history-grid {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      min-height: 58px;
+      min-height: 54px;
       align-items: center;
       justify-content: center;
     }
 
-    .history-empty {
-      color: rgba(255, 255, 255, 0.48);
-      font-size: 1rem;
-      letter-spacing: 0.5px;
-    }
-
     .drawn-ball {
-      width: 52px;
-      height: 52px;
+      width: 50px;
+      height: 50px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.45rem;
+      font-size: 1.4rem;
       color: #111111;
       border: 2.5px solid #111111;
       background: radial-gradient(circle at 32% 28%, #ffffff 0%, #ffe659 38%, #ffb700 82%, #b57600 100%);
       box-shadow: 0 5px 12px rgba(0, 0, 0, 0.65), inset 0 -3px 6px rgba(0, 0, 0, 0.25);
-      animation: ballLand 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
     }
 
     .drawn-ball.latest {
-      box-shadow: 0 0 16px #ffd500, 0 5px 14px rgba(0, 0, 0, 0.75);
-      transform: scale(1.08);
+      box-shadow: 0 0 18px #ffd500, 0 0 8px #ffffff, 0 5px 14px rgba(0, 0, 0, 0.8);
+      transform: scale(1.12);
+      animation: ballLand 0.38s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     @keyframes ballLand {
       0% {
         opacity: 0;
-        transform: scale(1.8) translateY(-24px);
+        transform: scale(1.7) translateY(-18px);
       }
       100% {
         opacity: 1;
-        transform: scale(1) translateY(0);
+        transform: scale(1.12) translateY(0);
       }
     }
 
@@ -284,7 +256,7 @@
     }
 
     #spotlight.closing .spotlight-ball {
-      animation: flyDown 0.38s cubic-bezier(0.5, 0, 0.75, 0) forwards;
+      animation: flyDown 0.36s cubic-bezier(0.5, 0, 0.75, 0) forwards;
     }
 
     .spotlight-ball {
@@ -340,32 +312,23 @@
   </style>
 </head>
 <body>
+  <header class="jungle-header" aria-label="JUNGLE"></header>
+
   <div class="top-controls">
+    <div class="counter-pill" id="historyCount">0 / 20</div>
     <button class="btn-control" type="button" id="resetBtn">Reiniciar</button>
   </div>
 
   <main class="stage">
-    <div class="drum-wrapper" id="drumWrapper" title="Haz clic o presiona Espacio para sacar una bolita">
+    <div class="drum-wrapper" id="drumWrapper" title="Presiona Espacio o haz clic para sacar una bolita">
       <div class="drum-inner">
         <canvas id="drumCanvas" width="440" height="440"></canvas>
       </div>
     </div>
-
-    <div class="prompt-bar" id="promptBar">
-      <span>Presiona</span>
-      <kbd>ESPACIO</kbd>
-      <span>para sacar bolita</span>
-    </div>
   </main>
 
-  <section class="history-section" aria-label="Bolitas que ya salieron">
-    <div class="history-header">
-      <div class="history-title">BOLITAS QUE HAN SALIDO</div>
-      <div class="history-count" id="historyCount">0 / 20</div>
-    </div>
-    <div class="history-grid" id="historyGrid">
-      <span class="history-empty">Aún no ha salido ninguna bolita...</span>
-    </div>
+  <section class="history-section" aria-label="Números extraídos">
+    <div class="history-grid" id="historyGrid"></div>
   </section>
 
   <div id="spotlight" aria-live="polite">
@@ -376,21 +339,24 @@
   <script>
     const TOTAL_BALLS = 20;
     const SPOTLIGHT_DURATION_MS = 2400;
-    const SPIN_BOOST_MS = 380;
+    const SPIN_BOOST_MS = 400;
 
     const canvas = document.getElementById('drumCanvas');
     const ctx = canvas.getContext('2d');
     const drumWrapper = document.getElementById('drumWrapper');
     const historyGrid = document.getElementById('historyGrid');
     const historyCount = document.getElementById('historyCount');
-    const promptBar = document.getElementById('promptBar');
     const spotlight = document.getElementById('spotlight');
     const spotlightBall = document.getElementById('spotlightBall');
     const resetBtn = document.getElementById('resetBtn');
 
     const CENTER = canvas.width / 2;
     const DRUM_RADIUS = canvas.width / 2 - 10;
-    const BALL_RADIUS = 23;
+    const BALL_RADIUS = 22;
+    const GRAVITY = 0.23;
+    const RESTITUTION = 0.84;
+    const WALL_RESTITUTION = 0.78;
+    const MAX_PARTICLES = 120;
 
     const BALL_STYLES = [
       { bg1: '#ffffff', bg2: '#ffe96b', bg3: '#f5a600', text: '#111111' },
@@ -400,18 +366,22 @@
     ];
 
     let balls = [];
+    let particles = [];
     let drawnNumbers = [];
+    let latestDrawn = null;
     let isSpinning = false;
     let activeSpotlightNum = null;
     let spotlightTimer = null;
     let boostMultiplier = 1;
+    let drumAngle = 0;
 
     function createBalls() {
       balls = [];
+      particles = [];
       for (let num = 1; num <= TOTAL_BALLS; num++) {
         const angle = Math.random() * Math.PI * 2;
-        const dist = Math.random() * (DRUM_RADIUS - BALL_RADIUS - 14);
-        const speed = 1.6 + Math.random() * 1.4;
+        const dist = Math.random() * (DRUM_RADIUS - BALL_RADIUS - 20);
+        const speed = 1.5 + Math.random() * 2.5;
         const dir = Math.random() * Math.PI * 2;
         balls.push({
           num,
@@ -419,23 +389,62 @@
           y: CENTER + Math.sin(angle) * dist,
           vx: Math.cos(dir) * speed,
           vy: Math.sin(dir) * speed,
+          rot: Math.random() * Math.PI * 2,
+          vrot: (Math.random() - 0.5) * 0.08,
           style: BALL_STYLES[(num - 1) % BALL_STYLES.length]
         });
       }
     }
 
+    function spawnParticles(x, y, intensity = 1) {
+      if (particles.length >= MAX_PARTICLES) return;
+      const count = Math.min(6, Math.max(2, Math.floor(intensity * 2.2)));
+      const colors = ['#ffd500', '#ffffff', '#ffae00'];
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 1.0 + Math.random() * (2.2 * Math.min(intensity, 2.2));
+        particles.push({
+          x,
+          y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - 0.4,
+          radius: 1.5 + Math.random() * 2.2,
+          life: 1.0,
+          decay: 0.045 + Math.random() * 0.04,
+          color: colors[Math.floor(Math.random() * colors.length)]
+        });
+      }
+    }
+
     function updatePhysics() {
-      const maxSpeed = 4.2 * boostMultiplier;
+      drumAngle += 0.022 * boostMultiplier;
+
       for (let i = 0; i < balls.length; i++) {
         const b = balls[i];
 
-        // Gentle swirl force around the center
-        const dxCenter = b.x - CENTER;
-        const dyCenter = b.y - CENTER;
-        b.vx += (-dyCenter * 0.00045) * boostMultiplier;
-        b.vy += (dxCenter * 0.00045) * boostMultiplier;
+        // Downward gravity
+        b.vy += GRAVITY;
 
-        // Clamp speed
+        // Rotating drum air / paddle lift near the bottom & sides
+        const dxC = b.x - CENTER;
+        const dyC = b.y - CENTER;
+        const distC = Math.hypot(dxC, dyC) || 1;
+        const tangentialStrength = (0.048 + (distC / DRUM_RADIUS) * 0.055) * boostMultiplier;
+        const tx = -dyC / distC;
+        const ty = dxC / distC;
+        b.vx += tx * tangentialStrength;
+        b.vy += ty * tangentialStrength;
+
+        // Updraft kick when balls settle at the bottom of the drum
+        if (dyC > DRUM_RADIUS * 0.42 && Math.random() < 0.09 * boostMultiplier) {
+          b.vy -= (2.8 + Math.random() * 2.6) * Math.min(boostMultiplier, 2.0);
+          b.vx += (Math.random() - 0.5) * 3.0;
+        }
+
+        // Gentle damping & speed cap
+        b.vx *= 0.996;
+        b.vy *= 0.996;
+        const maxSpeed = 10.5 * Math.min(boostMultiplier, 1.8);
         const spd = Math.hypot(b.vx, b.vy);
         if (spd > maxSpeed) {
           b.vx = (b.vx / spd) * maxSpeed;
@@ -444,8 +453,9 @@
 
         b.x += b.vx;
         b.y += b.vy;
+        b.rot += b.vrot;
 
-        // Bounce off circular drum wall
+        // Collision against inner circular drum wall
         const dx = b.x - CENTER;
         const dy = b.y - CENTER;
         const dist = Math.hypot(dx, dy);
@@ -455,13 +465,24 @@
           const ny = dy / dist;
           b.x = CENTER + nx * limit;
           b.y = CENTER + ny * limit;
-          const dot = b.vx * nx + b.vy * ny;
-          b.vx -= 2 * dot * nx;
-          b.vy -= 2 * dot * ny;
+
+          const vn = b.vx * nx + b.vy * ny;
+          if (vn > 0) {
+            b.vx -= (1 + WALL_RESTITUTION) * vn * nx;
+            b.vy -= (1 + WALL_RESTITUTION) * vn * ny;
+            // Add tangential friction from spinning drum wall
+            b.vx += -ny * (0.45 * boostMultiplier);
+            b.vy += nx * (0.45 * boostMultiplier);
+            b.vrot = (b.vx * -ny + b.vy * nx) * 0.03;
+
+            if (vn > 2.4) {
+              spawnParticles(b.x + nx * BALL_RADIUS, b.y + ny * BALL_RADIUS, vn / 3.2);
+            }
+          }
         }
       }
 
-      // Simple ball-to-ball collisions
+      // Elastic ball-to-ball collisions with particle sparks
       for (let i = 0; i < balls.length; i++) {
         for (let j = i + 1; j < balls.length; j++) {
           const a = balls[i];
@@ -470,31 +491,77 @@
           const dy = b.y - a.y;
           const dist = Math.hypot(dx, dy);
           const minDist = BALL_RADIUS * 2;
+
           if (dist < minDist && dist > 0) {
             const nx = dx / dist;
             const ny = dy / dist;
             const overlap = (minDist - dist) / 2;
+
             a.x -= nx * overlap;
             a.y -= ny * overlap;
             b.x += nx * overlap;
             b.y += ny * overlap;
 
-            const dvx = a.vx - b.vx;
-            const dvy = a.vy - b.vy;
-            const rel = dvx * nx + dvy * ny;
-            if (rel > 0) {
-              a.vx -= rel * nx;
-              a.vy -= rel * ny;
-              b.vx += rel * nx;
-              b.vy += rel * ny;
+            const rvx = b.vx - a.vx;
+            const rvy = b.vy - a.vy;
+            const velAlongNormal = rvx * nx + rvy * ny;
+
+            if (velAlongNormal < 0) {
+              const impulse = -(1 + RESTITUTION) * velAlongNormal / 2;
+              const ix = impulse * nx;
+              const iy = impulse * ny;
+              a.vx -= ix;
+              a.vy -= iy;
+              b.vx += ix;
+              b.vy += iy;
+
+              a.vrot += (Math.random() - 0.5) * 0.06;
+              b.vrot += (Math.random() - 0.5) * 0.06;
+
+              const impact = Math.abs(velAlongNormal);
+              if (impact > 2.1) {
+                const cx = (a.x + b.x) / 2;
+                const cy = (a.y + b.y) / 2;
+                spawnParticles(cx, cy, impact / 2.8);
+              }
             }
           }
         }
       }
+
+      // Update collision particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.08;
+        p.life -= p.decay;
+        if (p.life <= 0) {
+          particles.splice(i, 1);
+        }
+      }
     }
 
-    function drawBalls() {
+    function drawDrumPaddles() {
+      ctx.save();
+      ctx.translate(CENTER, CENTER);
+      ctx.rotate(drumAngle);
+      ctx.strokeStyle = 'rgba(255, 213, 0, 0.22)';
+      ctx.lineWidth = 6;
+      ctx.lineCap = 'round';
+      for (let k = 0; k < 3; k++) {
+        const a = (k * Math.PI * 2) / 3;
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(a) * (DRUM_RADIUS * 0.58), Math.sin(a) * (DRUM_RADIUS * 0.58));
+        ctx.lineTo(Math.cos(a) * (DRUM_RADIUS - 6), Math.sin(a) * (DRUM_RADIUS - 6));
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawBallsAndParticles() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawDrumPaddles();
 
       for (const b of balls) {
         const grad = ctx.createRadialGradient(
@@ -517,17 +584,32 @@
         ctx.strokeStyle = '#111111';
         ctx.stroke();
 
+        ctx.save();
+        ctx.translate(b.x, b.y);
+        ctx.rotate(Math.sin(b.rot) * 0.22);
         ctx.fillStyle = b.style.text;
-        ctx.font = '22px "Luckiest Guy", cursive';
+        ctx.font = '21px "Luckiest Guy", cursive';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(String(b.num), b.x, b.y + 2);
+        ctx.fillText(String(b.num), 0, 2);
+        ctx.restore();
+      }
+
+      // Draw collision particles
+      for (const p of particles) {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, p.life);
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
       }
     }
 
     function loop() {
       updatePhysics();
-      drawBalls();
+      drawBallsAndParticles();
       requestAnimationFrame(loop);
     }
 
@@ -535,18 +617,13 @@
       historyCount.textContent = `${drawnNumbers.length} / ${TOTAL_BALLS}`;
       historyGrid.innerHTML = '';
 
-      if (drawnNumbers.length === 0) {
-        const empty = document.createElement('span');
-        empty.className = 'history-empty';
-        empty.textContent = 'Aún no ha salido ninguna bolita...';
-        historyGrid.appendChild(empty);
-        return;
-      }
+      // Always display drawn balls in ascending ordinal order (1 to 20)
+      const sorted = [...drawnNumbers].sort((a, b) => a - b);
 
-      drawnNumbers.forEach((num, idx) => {
+      sorted.forEach((num) => {
         const ballEl = document.createElement('div');
         ballEl.className = 'drawn-ball';
-        if (idx === drawnNumbers.length - 1) {
+        if (num === latestDrawn) {
           ballEl.classList.add('latest');
         }
         ballEl.textContent = num;
@@ -564,35 +641,25 @@
         spotlightTimer = null;
       }
 
-      if (immediate) {
+      const finalize = () => {
         spotlight.classList.remove('active', 'closing');
         drawnNumbers.push(numToCommit);
+        latestDrawn = numToCommit;
         renderHistory();
-        updatePromptState();
+      };
+
+      if (immediate) {
+        finalize();
         return;
       }
 
       spotlight.classList.add('closing');
-      setTimeout(() => {
-        spotlight.classList.remove('active', 'closing');
-        drawnNumbers.push(numToCommit);
-        renderHistory();
-        updatePromptState();
-      }, 360);
-    }
-
-    function updatePromptState() {
-      if (balls.length === 0 && activeSpotlightNum === null) {
-        promptBar.innerHTML = '<span>¡Salieron las 20 bolitas! Presiona <strong>Reiniciar</strong> para otra ronda</span>';
-      } else {
-        promptBar.innerHTML = '<span>Presiona</span> <kbd>ESPACIO</kbd> <span>para sacar bolita</span>';
-      }
+      setTimeout(finalize, 340);
     }
 
     function drawNextBall() {
       if (isSpinning) return;
 
-      // If a ball is currently shown in spotlight, move it to history first
       if (activeSpotlightNum !== null) {
         commitSpotlightBall(true);
       }
@@ -600,8 +667,14 @@
       if (balls.length === 0) return;
 
       isSpinning = true;
-      boostMultiplier = 3.2;
+      boostMultiplier = 3.0;
       drumWrapper.classList.add('spinning');
+
+      // Extra upward burst to agitate balls before picking
+      balls.forEach((b) => {
+        b.vy -= 3.5 + Math.random() * 3.5;
+        b.vx += (Math.random() - 0.5) * 5.0;
+      });
 
       setTimeout(() => {
         const randomIndex = Math.floor(Math.random() * balls.length);
@@ -642,9 +715,9 @@
       drumWrapper.classList.remove('spinning');
       spotlight.classList.remove('active', 'closing');
       drawnNumbers = [];
+      latestDrawn = null;
       createBalls();
       renderHistory();
-      updatePromptState();
     }
 
     window.addEventListener('keydown', (e) => {
@@ -659,7 +732,6 @@
 
     createBalls();
     renderHistory();
-    updatePromptState();
     loop();
   </script>
 </body>

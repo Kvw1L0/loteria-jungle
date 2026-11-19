@@ -37,15 +37,15 @@
       flex-direction: column;
       align-items: center;
       width: 100%;
-      max-width: 340px;
+      max-width: 400px;
     }
 
     #grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
       width: 100%;
-      max-width: 260px;
+      max-width: 360px;
       margin-top: 12px;
     }
 
@@ -190,7 +190,7 @@
 
     function sendWhatsApp() {
       const message = `¡LOTERÍA JUNGLE! Completé mi cartón con los números: ${cardNumbers.join(', ')}`;
-      const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+      const url = `https://wa.me/56986532423?text=${encodeURIComponent(message)}`;
       window.open(url, '_blank', 'noopener,noreferrer');
     }
   </script>
