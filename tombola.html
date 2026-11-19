@@ -53,8 +53,8 @@
       max-height: 124px;
       object-fit: contain;
       flex-shrink: 0;
-      margin-top: 6px;
-      margin-bottom: 6px;
+      margin-top: clamp(22px, 4vh, 44px);
+      margin-bottom: 8px;
       filter:
         drop-shadow(2px 0 0 #ffd500)
         drop-shadow(-2px 0 0 #ffd500)
@@ -80,11 +80,11 @@
       margin: 4px 0 10px;
     }
 
-    /* Giant Circular Tombola Drum (+45% larger) */
+    /* Giant Circular Tombola Drum (+20% larger) */
     .drum-wrapper {
       position: relative;
-      width: min(86vw, 62vh, 610px);
-      height: min(86vw, 62vh, 610px);
+      width: min(88vw, 72vh, 732px);
+      height: min(88vw, 72vh, 732px);
       border-radius: 50%;
       padding: 13px;
       background: conic-gradient(
