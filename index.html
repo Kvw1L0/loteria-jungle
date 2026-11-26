@@ -45,6 +45,12 @@
       background-attachment: fixed;
       background-size: cover;
       overflow-x: hidden;
+      opacity: 0;
+      transition: opacity 0.16s ease;
+    }
+
+    body.brand-ready {
+      opacity: 1;
     }
 
     .card-wrapper {
@@ -139,83 +145,85 @@
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script>
-    const cfg = window.ACTIVE_BRAND_CONFIG || {};
-    const TOTAL_NUMBERS = Number(cfg.totalNumbers) || 20;
-    const CARD_SIZE = Number(cfg.cardSize) || 6;
-    const GRID_COLUMNS = Number(cfg.gridColumns) || 3;
+    window.brandReady.then((cfg) => {
+      cfg = cfg || window.ACTIVE_BRAND_CONFIG || {};
+      const TOTAL_NUMBERS = Number(cfg.totalNumbers) || 20;
+      const CARD_SIZE = Number(cfg.cardSize) || 6;
+      const GRID_COLUMNS = Number(cfg.gridColumns) || 3;
 
-    document.title = `Lotería ${cfg.brandName || ""}`.trim();
-    document.documentElement.style.setProperty("--grid-columns", String(GRID_COLUMNS));
+      document.title = `Lotería ${cfg.brandName || ""}`.trim();
+      document.documentElement.style.setProperty("--grid-columns", String(GRID_COLUMNS));
 
-    const grid = document.getElementById("grid");
-    const whatsappBtn = document.getElementById("whatsappBtn");
+      const grid = document.getElementById("grid");
+      const whatsappBtn = document.getElementById("whatsappBtn");
 
-    function generateUniqueRandomNumbers(max, count) {
-      const pool = Array.from({ length: max }, (_, i) => i + 1);
-      for (let i = pool.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [pool[i], pool[j]] = [pool[j], pool[i]];
-      }
-      return pool.slice(0, Math.min(count, max));
-    }
-
-    const cardNumbers = generateUniqueRandomNumbers(TOTAL_NUMBERS, CARD_SIZE);
-    let confettiFired = false;
-
-    function checkCompletion() {
-      const cells = grid.querySelectorAll(".cell");
-      const markedCount = grid.querySelectorAll(".cell.marked").length;
-      const isComplete = markedCount === cells.length;
-
-      if (isComplete) {
-        whatsappBtn.style.display = "block";
-        if (!confettiFired && typeof confetti === "function") {
-          confettiFired = true;
-          confetti({
-            particleCount: 110,
-            spread: 80,
-            origin: { y: 0.6 },
-            colors: cfg.confettiColors || ["#ffd500", "#01afff", "#ffffff", "#25d366", "#111111"]
-          });
+      function generateUniqueRandomNumbers(max, count) {
+        const pool = Array.from({ length: max }, (_, i) => i + 1);
+        for (let i = pool.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [pool[i], pool[j]] = [pool[j], pool[i]];
         }
-      } else {
-        whatsappBtn.style.display = "none";
-        confettiFired = false;
+        return pool.slice(0, Math.min(count, max));
       }
-    }
 
-    cardNumbers.forEach((num) => {
-      const cell = document.createElement("div");
-      cell.className = "cell";
-      cell.textContent = num;
-      cell.setAttribute("role", "button");
-      cell.setAttribute("tabindex", "0");
-      cell.setAttribute("aria-pressed", "false");
+      const cardNumbers = generateUniqueRandomNumbers(TOTAL_NUMBERS, CARD_SIZE);
+      let confettiFired = false;
 
-      const toggleCell = () => {
-        const marked = cell.classList.toggle("marked");
-        cell.setAttribute("aria-pressed", String(marked));
-        checkCompletion();
-      };
+      function checkCompletion() {
+        const cells = grid.querySelectorAll(".cell");
+        const markedCount = grid.querySelectorAll(".cell.marked").length;
+        const isComplete = markedCount === cells.length;
 
-      cell.addEventListener("click", toggleCell);
-      cell.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          toggleCell();
+        if (isComplete) {
+          whatsappBtn.style.display = "block";
+          if (!confettiFired && typeof confetti === "function") {
+            confettiFired = true;
+            confetti({
+              particleCount: 110,
+              spread: 80,
+              origin: { y: 0.6 },
+              colors: cfg.confettiColors || ["#ffd500", "#01afff", "#ffffff", "#25d366", "#111111"]
+            });
+          }
+        } else {
+          whatsappBtn.style.display = "none";
+          confettiFired = false;
         }
+      }
+
+      cardNumbers.forEach((num) => {
+        const cell = document.createElement("div");
+        cell.className = "cell";
+        cell.textContent = num;
+        cell.setAttribute("role", "button");
+        cell.setAttribute("tabindex", "0");
+        cell.setAttribute("aria-pressed", "false");
+
+        const toggleCell = () => {
+          const marked = cell.classList.toggle("marked");
+          cell.setAttribute("aria-pressed", String(marked));
+          checkCompletion();
+        };
+
+        cell.addEventListener("click", toggleCell);
+        cell.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            toggleCell();
+          }
+        });
+
+        grid.appendChild(cell);
       });
 
-      grid.appendChild(cell);
+      window.sendWhatsApp = function () {
+        const phone = String(cfg.whatsappPhone || "56986532423").replace(/\D/g, "");
+        const template = cfg.whatsappMessage || "¡LOTERÍA! Completé mi cartón con los números: {numbers}";
+        const message = template.replace("{numbers}", cardNumbers.join(", "));
+        const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+        window.open(url, "_blank", "noopener,noreferrer");
+      };
     });
-
-    function sendWhatsApp() {
-      const phone = String(cfg.whatsappPhone || "56986532423").replace(/\D/g, "");
-      const template = cfg.whatsappMessage || "¡LOTERÍA! Completé mi cartón con los números: {numbers}";
-      const message = template.replace("{numbers}", cardNumbers.join(", "));
-      const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-      window.open(url, "_blank", "noopener,noreferrer");
-    }
   </script>
 </body>
 </html>

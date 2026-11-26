@@ -355,7 +355,7 @@
       </div>
 
       <div class="actions-grid">
-        <button class="btn btn-primary" type="button" id="applyPreviewBtn">Guardar y Aplicar</button>
+        <button class="btn btn-primary" type="button" id="applyPreviewBtn">Guardar y Publicar para Todos</button>
         <button class="btn btn-success" type="button" id="downloadConfigBtn">Descargar brand.config.js</button>
         <button class="btn btn-secondary" type="button" id="copyCardLinkBtn">Copiar link Cartón</button>
         <button class="btn btn-secondary" type="button" id="copyTombolaLinkBtn">Copiar link Tómbola</button>
@@ -461,7 +461,28 @@
     }
 
     function refreshPreview() {
-      previewFrame.src = `${activePreviewPage}?t=${Date.now()}`;
+      previewFrame.src = `${activePreviewPage}?preview=1&t=${Date.now()}`;
+    }
+
+    async function publishToCloud(cfg) {
+      if (!window.location.protocol.startsWith("http")) {
+        showStatus("Guardado localmente (abre desde Vercel para publicar en la nube).", true);
+        return false;
+      }
+      try {
+        showStatus("Guardando en la nube...");
+        const res = await fetch("/api/brand", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(cfg)
+        });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        showStatus("¡Publicado en la nube! Cualquier celular que recargue index.html o tombola.html verá los cambios.");
+        return true;
+      } catch (err) {
+        showStatus("Guardado en este PC, pero no se pudo publicar en la nube (" + err.message + ").", true);
+        return false;
+      }
     }
 
     function compressImage(file, maxDim, asJpeg) {
@@ -542,10 +563,10 @@
       });
     });
 
-    document.getElementById("applyPreviewBtn").addEventListener("click", () => {
-      saveConfig();
+    document.getElementById("applyPreviewBtn").addEventListener("click", async () => {
+      const cfg = saveConfig();
       refreshPreview();
-      showStatus("Configuración aplicada a la vista previa y guardada en este navegador.");
+      await publishToCloud(cfg);
     });
 
     document.getElementById("downloadConfigBtn").addEventListener("click", () => {
@@ -586,11 +607,16 @@
       window.open("tombola.html", "_blank");
     });
 
-    document.getElementById("resetDefaultBtn").addEventListener("click", () => {
+    document.getElementById("resetDefaultBtn").addEventListener("click", async () => {
       localStorage.removeItem(STORAGE_KEY);
       loadIntoForm(defaultCfg);
       refreshPreview();
-      showStatus("Marca restaurada a JUNGLE por defecto.");
+      if (window.location.protocol.startsWith("http")) {
+        try {
+          await fetch("/api/brand", { method: "DELETE" });
+        } catch {}
+      }
+      showStatus("Marca restaurada a JUNGLE por defecto en la nube y en este navegador.");
     });
 
     document.getElementById("tabCardBtn").addEventListener("click", () => {
@@ -607,13 +633,27 @@
       refreshPreview();
     });
 
-    // Init form from saved config or default
-    let initialCfg = defaultCfg;
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) initialCfg = Object.assign({}, defaultCfg, JSON.parse(saved));
-    } catch {}
-    loadIntoForm(initialCfg);
+    // Init form from cloud first, then localStorage, then default
+    (async function initForm() {
+      let initialCfg = defaultCfg;
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) initialCfg = Object.assign({}, defaultCfg, JSON.parse(saved));
+      } catch {}
+
+      if (window.location.protocol.startsWith("http")) {
+        try {
+          const res = await fetch(`/api/brand?t=${Date.now()}`, { cache: "no-store" });
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data.config) {
+              initialCfg = Object.assign({}, defaultCfg, data.config);
+            }
+          }
+        } catch {}
+      }
+      loadIntoForm(initialCfg);
+    })();
   </script>
 </body>
 </html>

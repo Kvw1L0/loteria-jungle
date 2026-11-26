@@ -1,0 +1,24 @@
+{
+  "name": "jungle-loteria",
+  "version": "1.0.0",
+  "description": "",
+  "main": "brand.config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kvw1L0/loteria-jungle.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Kvw1L0/loteria-jungle/issues"
+  },
+  "homepage": "https://github.com/Kvw1L0/loteria-jungle#readme",
+  "dependencies": {
+    "@vercel/blob": "^2.9.0"
+  }
+}

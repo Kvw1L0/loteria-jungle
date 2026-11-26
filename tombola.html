@@ -43,6 +43,12 @@
       background-size: cover;
       position: relative;
       overflow-x: hidden;
+      opacity: 0;
+      transition: opacity 0.16s ease;
+    }
+
+    body.brand-ready {
+      opacity: 1;
     }
 
     body::before {
@@ -303,386 +309,388 @@
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script>
-    const cfg = window.ACTIVE_BRAND_CONFIG || {};
-    const TOTAL_BALLS = Number(cfg.totalNumbers) || 20;
-    const SPOTLIGHT_DURATION_MS = 2400;
-    const SPIN_BOOST_MS = 400;
+    window.brandReady.then((cfg) => {
+      cfg = cfg || window.ACTIVE_BRAND_CONFIG || {};
+      const TOTAL_BALLS = Number(cfg.totalNumbers) || 20;
+      const SPOTLIGHT_DURATION_MS = 2400;
+      const SPIN_BOOST_MS = 400;
 
-    document.title = `Tómbola ${cfg.brandName || ""}`.trim();
+      document.title = `Tómbola ${cfg.brandName || ""}`.trim();
 
-    const brandLogo = document.getElementById("brandLogo");
-    if (cfg.logoUrl) {
-      brandLogo.src = cfg.logoUrl;
-      brandLogo.alt = cfg.brandName || "Logo";
-      brandLogo.style.display = "block";
-    } else {
-      brandLogo.style.display = "none";
-    }
-    brandLogo.classList.toggle("with-outline", cfg.logoOutline !== false);
-
-    const canvas = document.getElementById("drumCanvas");
-    const ctx = canvas.getContext("2d");
-    const drumWrapper = document.getElementById("drumWrapper");
-    const historyGrid = document.getElementById("historyGrid");
-    const spotlight = document.getElementById("spotlight");
-    const spotlightBall = document.getElementById("spotlightBall");
-
-    const CENTER = canvas.width / 2;
-    const DRUM_RADIUS = canvas.width / 2 - 14;
-    const BALL_RADIUS = 28;
-    const GRAVITY = 0.23;
-    const RESTITUTION = 0.84;
-    const WALL_RESTITUTION = 0.78;
-    const MAX_PARTICLES = 120;
-
-    const PRIMARY_COLOR = cfg.primaryColor || "#ffd500";
-    const FONT_FAMILY = cfg.fontFamily || "Luckiest Guy";
-    const PARTICLE_COLORS = cfg.particleColors || [PRIMARY_COLOR, "#ffffff", "#ffae00"];
-    const CONFETTI_COLORS = cfg.confettiColors || [PRIMARY_COLOR, "#ffffff", "#ff9900", "#111111"];
-    const BALL_STYLES = cfg.ballStyles || [
-      { bg1: "#ffffff", bg2: "#ffe96b", bg3: "#f5a600", text: "#111111" },
-      { bg1: "#555555", bg2: "#1f1f1f", bg3: "#050505", text: PRIMARY_COLOR },
-      { bg1: "#ffffff", bg2: "#fff3a8", bg3: PRIMARY_COLOR, text: "#111111" },
-      { bg1: "#fff8d6", bg2: PRIMARY_COLOR, bg3: "#c77d00", text: "#111111" }
-    ];
-
-    let balls = [];
-    let particles = [];
-    let drawnNumbers = [];
-    let latestDrawn = null;
-    let isSpinning = false;
-    let activeSpotlightNum = null;
-    let spotlightTimer = null;
-    let boostMultiplier = 1;
-    let drumAngle = 0;
-
-    function createBalls() {
-      balls = [];
-      particles = [];
-      for (let num = 1; num <= TOTAL_BALLS; num++) {
-        const angle = Math.random() * Math.PI * 2;
-        const dist = Math.random() * (DRUM_RADIUS - BALL_RADIUS - 20);
-        const speed = 1.5 + Math.random() * 2.5;
-        const dir = Math.random() * Math.PI * 2;
-        balls.push({
-          num,
-          x: CENTER + Math.cos(angle) * dist,
-          y: CENTER + Math.sin(angle) * dist,
-          vx: Math.cos(dir) * speed,
-          vy: Math.sin(dir) * speed,
-          rot: Math.random() * Math.PI * 2,
-          vrot: (Math.random() - 0.5) * 0.08,
-          style: BALL_STYLES[(num - 1) % BALL_STYLES.length]
-        });
+      const brandLogo = document.getElementById("brandLogo");
+      if (cfg.logoUrl) {
+        brandLogo.src = cfg.logoUrl;
+        brandLogo.alt = cfg.brandName || "Logo";
+        brandLogo.style.display = "block";
+      } else {
+        brandLogo.style.display = "none";
       }
-    }
+      brandLogo.classList.toggle("with-outline", cfg.logoOutline !== false);
 
-    function spawnParticles(x, y, intensity = 1) {
-      if (particles.length >= MAX_PARTICLES) return;
-      const count = Math.min(6, Math.max(2, Math.floor(intensity * 2.2)));
-      for (let i = 0; i < count; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const speed = 1.0 + Math.random() * (2.2 * Math.min(intensity, 2.2));
-        particles.push({
-          x,
-          y,
-          vx: Math.cos(angle) * speed,
-          vy: Math.sin(angle) * speed - 0.4,
-          radius: 1.5 + Math.random() * 2.2,
-          life: 1.0,
-          decay: 0.045 + Math.random() * 0.04,
-          color: PARTICLE_COLORS[Math.floor(Math.random() * PARTICLE_COLORS.length)]
-        });
+      const canvas = document.getElementById("drumCanvas");
+      const ctx = canvas.getContext("2d");
+      const drumWrapper = document.getElementById("drumWrapper");
+      const historyGrid = document.getElementById("historyGrid");
+      const spotlight = document.getElementById("spotlight");
+      const spotlightBall = document.getElementById("spotlightBall");
+
+      const CENTER = canvas.width / 2;
+      const DRUM_RADIUS = canvas.width / 2 - 14;
+      const BALL_RADIUS = 28;
+      const GRAVITY = 0.23;
+      const RESTITUTION = 0.84;
+      const WALL_RESTITUTION = 0.78;
+      const MAX_PARTICLES = 120;
+
+      const PRIMARY_COLOR = cfg.primaryColor || "#ffd500";
+      const FONT_FAMILY = cfg.fontFamily || "Luckiest Guy";
+      const PARTICLE_COLORS = cfg.particleColors || [PRIMARY_COLOR, "#ffffff", "#ffae00"];
+      const CONFETTI_COLORS = cfg.confettiColors || [PRIMARY_COLOR, "#ffffff", "#ff9900", "#111111"];
+      const BALL_STYLES = cfg.ballStyles || [
+        { bg1: "#ffffff", bg2: "#ffe96b", bg3: "#f5a600", text: "#111111" },
+        { bg1: "#555555", bg2: "#1f1f1f", bg3: "#050505", text: PRIMARY_COLOR },
+        { bg1: "#ffffff", bg2: "#fff3a8", bg3: PRIMARY_COLOR, text: "#111111" },
+        { bg1: "#fff8d6", bg2: PRIMARY_COLOR, bg3: "#c77d00", text: "#111111" }
+      ];
+
+      let balls = [];
+      let particles = [];
+      let drawnNumbers = [];
+      let latestDrawn = null;
+      let isSpinning = false;
+      let activeSpotlightNum = null;
+      let spotlightTimer = null;
+      let boostMultiplier = 1;
+      let drumAngle = 0;
+
+      function createBalls() {
+        balls = [];
+        particles = [];
+        for (let num = 1; num <= TOTAL_BALLS; num++) {
+          const angle = Math.random() * Math.PI * 2;
+          const dist = Math.random() * (DRUM_RADIUS - BALL_RADIUS - 20);
+          const speed = 1.5 + Math.random() * 2.5;
+          const dir = Math.random() * Math.PI * 2;
+          balls.push({
+            num,
+            x: CENTER + Math.cos(angle) * dist,
+            y: CENTER + Math.sin(angle) * dist,
+            vx: Math.cos(dir) * speed,
+            vy: Math.sin(dir) * speed,
+            rot: Math.random() * Math.PI * 2,
+            vrot: (Math.random() - 0.5) * 0.08,
+            style: BALL_STYLES[(num - 1) % BALL_STYLES.length]
+          });
+        }
       }
-    }
 
-    function updatePhysics() {
-      drumAngle += 0.022 * boostMultiplier;
-
-      for (let i = 0; i < balls.length; i++) {
-        const b = balls[i];
-        b.vy += GRAVITY;
-
-        const dxC = b.x - CENTER;
-        const dyC = b.y - CENTER;
-        const distC = Math.hypot(dxC, dyC) || 1;
-        const tangentialStrength = (0.048 + (distC / DRUM_RADIUS) * 0.055) * boostMultiplier;
-        const tx = -dyC / distC;
-        const ty = dxC / distC;
-        b.vx += tx * tangentialStrength;
-        b.vy += ty * tangentialStrength;
-
-        if (dyC > DRUM_RADIUS * 0.42 && Math.random() < 0.09 * boostMultiplier) {
-          b.vy -= (2.8 + Math.random() * 2.6) * Math.min(boostMultiplier, 2.0);
-          b.vx += (Math.random() - 0.5) * 3.0;
+      function spawnParticles(x, y, intensity = 1) {
+        if (particles.length >= MAX_PARTICLES) return;
+        const count = Math.min(6, Math.max(2, Math.floor(intensity * 2.2)));
+        for (let i = 0; i < count; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const speed = 1.0 + Math.random() * (2.2 * Math.min(intensity, 2.2));
+          particles.push({
+            x,
+            y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed - 0.4,
+            radius: 1.5 + Math.random() * 2.2,
+            life: 1.0,
+            decay: 0.045 + Math.random() * 0.04,
+            color: PARTICLE_COLORS[Math.floor(Math.random() * PARTICLE_COLORS.length)]
+          });
         }
+      }
 
-        b.vx *= 0.996;
-        b.vy *= 0.996;
-        const maxSpeed = 10.5 * Math.min(boostMultiplier, 1.8);
-        const spd = Math.hypot(b.vx, b.vy);
-        if (spd > maxSpeed) {
-          b.vx = (b.vx / spd) * maxSpeed;
-          b.vy = (b.vy / spd) * maxSpeed;
-        }
+      function updatePhysics() {
+        drumAngle += 0.022 * boostMultiplier;
 
-        b.x += b.vx;
-        b.y += b.vy;
-        b.rot += b.vrot;
+        for (let i = 0; i < balls.length; i++) {
+          const b = balls[i];
+          b.vy += GRAVITY;
 
-        const dx = b.x - CENTER;
-        const dy = b.y - CENTER;
-        const dist = Math.hypot(dx, dy);
-        const limit = DRUM_RADIUS - BALL_RADIUS;
-        if (dist > limit && dist > 0) {
-          const nx = dx / dist;
-          const ny = dy / dist;
-          b.x = CENTER + nx * limit;
-          b.y = CENTER + ny * limit;
+          const dxC = b.x - CENTER;
+          const dyC = b.y - CENTER;
+          const distC = Math.hypot(dxC, dyC) || 1;
+          const tangentialStrength = (0.048 + (distC / DRUM_RADIUS) * 0.055) * boostMultiplier;
+          const tx = -dyC / distC;
+          const ty = dxC / distC;
+          b.vx += tx * tangentialStrength;
+          b.vy += ty * tangentialStrength;
 
-          const vn = b.vx * nx + b.vy * ny;
-          if (vn > 0) {
-            b.vx -= (1 + WALL_RESTITUTION) * vn * nx;
-            b.vy -= (1 + WALL_RESTITUTION) * vn * ny;
-            b.vx += -ny * (0.45 * boostMultiplier);
-            b.vy += nx * (0.45 * boostMultiplier);
-            b.vrot = (b.vx * -ny + b.vy * nx) * 0.03;
-
-            if (vn > 2.4) {
-              spawnParticles(b.x + nx * BALL_RADIUS, b.y + ny * BALL_RADIUS, vn / 3.2);
-            }
+          if (dyC > DRUM_RADIUS * 0.42 && Math.random() < 0.09 * boostMultiplier) {
+            b.vy -= (2.8 + Math.random() * 2.6) * Math.min(boostMultiplier, 2.0);
+            b.vx += (Math.random() - 0.5) * 3.0;
           }
-        }
-      }
 
-      for (let i = 0; i < balls.length; i++) {
-        for (let j = i + 1; j < balls.length; j++) {
-          const a = balls[i];
-          const b = balls[j];
-          const dx = b.x - a.x;
-          const dy = b.y - a.y;
+          b.vx *= 0.996;
+          b.vy *= 0.996;
+          const maxSpeed = 10.5 * Math.min(boostMultiplier, 1.8);
+          const spd = Math.hypot(b.vx, b.vy);
+          if (spd > maxSpeed) {
+            b.vx = (b.vx / spd) * maxSpeed;
+            b.vy = (b.vy / spd) * maxSpeed;
+          }
+
+          b.x += b.vx;
+          b.y += b.vy;
+          b.rot += b.vrot;
+
+          const dx = b.x - CENTER;
+          const dy = b.y - CENTER;
           const dist = Math.hypot(dx, dy);
-          const minDist = BALL_RADIUS * 2;
-
-          if (dist < minDist && dist > 0) {
+          const limit = DRUM_RADIUS - BALL_RADIUS;
+          if (dist > limit && dist > 0) {
             const nx = dx / dist;
             const ny = dy / dist;
-            const overlap = (minDist - dist) / 2;
+            b.x = CENTER + nx * limit;
+            b.y = CENTER + ny * limit;
 
-            a.x -= nx * overlap;
-            a.y -= ny * overlap;
-            b.x += nx * overlap;
-            b.y += ny * overlap;
+            const vn = b.vx * nx + b.vy * ny;
+            if (vn > 0) {
+              b.vx -= (1 + WALL_RESTITUTION) * vn * nx;
+              b.vy -= (1 + WALL_RESTITUTION) * vn * ny;
+              b.vx += -ny * (0.45 * boostMultiplier);
+              b.vy += nx * (0.45 * boostMultiplier);
+              b.vrot = (b.vx * -ny + b.vy * nx) * 0.03;
 
-            const rvx = b.vx - a.vx;
-            const rvy = b.vy - a.vy;
-            const velAlongNormal = rvx * nx + rvy * ny;
-
-            if (velAlongNormal < 0) {
-              const impulse = -(1 + RESTITUTION) * velAlongNormal / 2;
-              const ix = impulse * nx;
-              const iy = impulse * ny;
-              a.vx -= ix;
-              a.vy -= iy;
-              b.vx += ix;
-              b.vy += iy;
-
-              a.vrot += (Math.random() - 0.5) * 0.06;
-              b.vrot += (Math.random() - 0.5) * 0.06;
-
-              const impact = Math.abs(velAlongNormal);
-              if (impact > 2.1) {
-                const cx = (a.x + b.x) / 2;
-                const cy = (a.y + b.y) / 2;
-                spawnParticles(cx, cy, impact / 2.8);
+              if (vn > 2.4) {
+                spawnParticles(b.x + nx * BALL_RADIUS, b.y + ny * BALL_RADIUS, vn / 3.2);
               }
             }
           }
         }
-      }
 
-      for (let i = particles.length - 1; i >= 0; i--) {
-        const p = particles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vy += 0.08;
-        p.life -= p.decay;
-        if (p.life <= 0) {
-          particles.splice(i, 1);
+        for (let i = 0; i < balls.length; i++) {
+          for (let j = i + 1; j < balls.length; j++) {
+            const a = balls[i];
+            const b = balls[j];
+            const dx = b.x - a.x;
+            const dy = b.y - a.y;
+            const dist = Math.hypot(dx, dy);
+            const minDist = BALL_RADIUS * 2;
+
+            if (dist < minDist && dist > 0) {
+              const nx = dx / dist;
+              const ny = dy / dist;
+              const overlap = (minDist - dist) / 2;
+
+              a.x -= nx * overlap;
+              a.y -= ny * overlap;
+              b.x += nx * overlap;
+              b.y += ny * overlap;
+
+              const rvx = b.vx - a.vx;
+              const rvy = b.vy - a.vy;
+              const velAlongNormal = rvx * nx + rvy * ny;
+
+              if (velAlongNormal < 0) {
+                const impulse = -(1 + RESTITUTION) * velAlongNormal / 2;
+                const ix = impulse * nx;
+                const iy = impulse * ny;
+                a.vx -= ix;
+                a.vy -= iy;
+                b.vx += ix;
+                b.vy += iy;
+
+                a.vrot += (Math.random() - 0.5) * 0.06;
+                b.vrot += (Math.random() - 0.5) * 0.06;
+
+                const impact = Math.abs(velAlongNormal);
+                if (impact > 2.1) {
+                  const cx = (a.x + b.x) / 2;
+                  const cy = (a.y + b.y) / 2;
+                  spawnParticles(cx, cy, impact / 2.8);
+                }
+              }
+            }
+          }
+        }
+
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const p = particles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.08;
+          p.life -= p.decay;
+          if (p.life <= 0) {
+            particles.splice(i, 1);
+          }
         }
       }
-    }
 
-    function drawDrumPaddles() {
-      ctx.save();
-      ctx.translate(CENTER, CENTER);
-      ctx.rotate(drumAngle);
-      ctx.strokeStyle = PRIMARY_COLOR;
-      ctx.globalAlpha = 0.22;
-      ctx.lineWidth = 6;
-      ctx.lineCap = "round";
-      for (let k = 0; k < 3; k++) {
-        const a = (k * Math.PI * 2) / 3;
-        ctx.beginPath();
-        ctx.moveTo(Math.cos(a) * (DRUM_RADIUS * 0.58), Math.sin(a) * (DRUM_RADIUS * 0.58));
-        ctx.lineTo(Math.cos(a) * (DRUM_RADIUS - 6), Math.sin(a) * (DRUM_RADIUS - 6));
-        ctx.stroke();
-      }
-      ctx.restore();
-    }
-
-    function drawBallsAndParticles() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawDrumPaddles();
-
-      for (const b of balls) {
-        const grad = ctx.createRadialGradient(
-          b.x - BALL_RADIUS * 0.35,
-          b.y - BALL_RADIUS * 0.35,
-          2,
-          b.x,
-          b.y,
-          BALL_RADIUS
-        );
-        grad.addColorStop(0, b.style.bg1);
-        grad.addColorStop(0.45, b.style.bg2);
-        grad.addColorStop(1, b.style.bg3);
-
-        ctx.beginPath();
-        ctx.arc(b.x, b.y, BALL_RADIUS, 0, Math.PI * 2);
-        ctx.fillStyle = grad;
-        ctx.fill();
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = "#111111";
-        ctx.stroke();
-
+      function drawDrumPaddles() {
         ctx.save();
-        ctx.translate(b.x, b.y);
-        ctx.rotate(Math.sin(b.rot) * 0.22);
-        ctx.fillStyle = b.style.text;
-        ctx.font = `26px "${FONT_FAMILY}", sans-serif`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(String(b.num), 0, 2);
+        ctx.translate(CENTER, CENTER);
+        ctx.rotate(drumAngle);
+        ctx.strokeStyle = PRIMARY_COLOR;
+        ctx.globalAlpha = 0.22;
+        ctx.lineWidth = 6;
+        ctx.lineCap = "round";
+        for (let k = 0; k < 3; k++) {
+          const a = (k * Math.PI * 2) / 3;
+          ctx.beginPath();
+          ctx.moveTo(Math.cos(a) * (DRUM_RADIUS * 0.58), Math.sin(a) * (DRUM_RADIUS * 0.58));
+          ctx.lineTo(Math.cos(a) * (DRUM_RADIUS - 6), Math.sin(a) * (DRUM_RADIUS - 6));
+          ctx.stroke();
+        }
         ctx.restore();
       }
 
-      for (const p of particles) {
-        ctx.save();
-        ctx.globalAlpha = Math.max(0, p.life);
-        ctx.fillStyle = p.color;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      }
-    }
+      function drawBallsAndParticles() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawDrumPaddles();
 
-    function loop() {
-      updatePhysics();
-      drawBallsAndParticles();
-      requestAnimationFrame(loop);
-    }
+        for (const b of balls) {
+          const grad = ctx.createRadialGradient(
+            b.x - BALL_RADIUS * 0.35,
+            b.y - BALL_RADIUS * 0.35,
+            2,
+            b.x,
+            b.y,
+            BALL_RADIUS
+          );
+          grad.addColorStop(0, b.style.bg1);
+          grad.addColorStop(0.45, b.style.bg2);
+          grad.addColorStop(1, b.style.bg3);
 
-    function renderHistory() {
-      historyGrid.innerHTML = "";
-      const sorted = [...drawnNumbers].sort((a, b) => a - b);
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, BALL_RADIUS, 0, Math.PI * 2);
+          ctx.fillStyle = grad;
+          ctx.fill();
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = "#111111";
+          ctx.stroke();
 
-      sorted.forEach((num) => {
-        const ballEl = document.createElement("div");
-        ballEl.className = "drawn-ball";
-        if (num === latestDrawn) {
-          ballEl.classList.add("latest");
-        }
-        ballEl.textContent = num;
-        historyGrid.appendChild(ballEl);
-      });
-    }
-
-    function commitSpotlightBall(immediate = false) {
-      if (activeSpotlightNum === null) return;
-      const numToCommit = activeSpotlightNum;
-      activeSpotlightNum = null;
-
-      if (spotlightTimer) {
-        clearTimeout(spotlightTimer);
-        spotlightTimer = null;
-      }
-
-      const finalize = () => {
-        spotlight.classList.remove("active", "closing");
-        drawnNumbers.push(numToCommit);
-        latestDrawn = numToCommit;
-        renderHistory();
-      };
-
-      if (immediate) {
-        finalize();
-        return;
-      }
-
-      spotlight.classList.add("closing");
-      setTimeout(finalize, 340);
-    }
-
-    function drawNextBall() {
-      if (isSpinning) return;
-
-      if (activeSpotlightNum !== null) {
-        commitSpotlightBall(true);
-      }
-
-      if (balls.length === 0) return;
-
-      isSpinning = true;
-      boostMultiplier = 3.0;
-      drumWrapper.classList.add("spinning");
-
-      balls.forEach((b) => {
-        b.vy -= 3.5 + Math.random() * 3.5;
-        b.vx += (Math.random() - 0.5) * 5.0;
-      });
-
-      setTimeout(() => {
-        const randomIndex = Math.floor(Math.random() * balls.length);
-        const [selected] = balls.splice(randomIndex, 1);
-
-        boostMultiplier = 1;
-        drumWrapper.classList.remove("spinning");
-        isSpinning = false;
-
-        activeSpotlightNum = selected.num;
-        spotlightBall.textContent = selected.num;
-        spotlight.classList.remove("closing");
-        spotlight.classList.add("active");
-
-        if (typeof confetti === "function") {
-          confetti({
-            particleCount: balls.length === 0 ? 120 : 35,
-            spread: balls.length === 0 ? 90 : 55,
-            origin: { y: 0.5 },
-            colors: CONFETTI_COLORS
-          });
+          ctx.save();
+          ctx.translate(b.x, b.y);
+          ctx.rotate(Math.sin(b.rot) * 0.22);
+          ctx.fillStyle = b.style.text;
+          ctx.font = `26px "${FONT_FAMILY}", sans-serif`;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(String(b.num), 0, 2);
+          ctx.restore();
         }
 
-        spotlightTimer = setTimeout(() => {
-          commitSpotlightBall(false);
-        }, SPOTLIGHT_DURATION_MS);
-      }, SPIN_BOOST_MS);
-    }
-
-    window.addEventListener("keydown", (e) => {
-      if (e.code === "Space") {
-        e.preventDefault();
-        drawNextBall();
+        for (const p of particles) {
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, p.life);
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
       }
+
+      function loop() {
+        updatePhysics();
+        drawBallsAndParticles();
+        requestAnimationFrame(loop);
+      }
+
+      function renderHistory() {
+        historyGrid.innerHTML = "";
+        const sorted = [...drawnNumbers].sort((a, b) => a - b);
+
+        sorted.forEach((num) => {
+          const ballEl = document.createElement("div");
+          ballEl.className = "drawn-ball";
+          if (num === latestDrawn) {
+            ballEl.classList.add("latest");
+          }
+          ballEl.textContent = num;
+          historyGrid.appendChild(ballEl);
+        });
+      }
+
+      function commitSpotlightBall(immediate = false) {
+        if (activeSpotlightNum === null) return;
+        const numToCommit = activeSpotlightNum;
+        activeSpotlightNum = null;
+
+        if (spotlightTimer) {
+          clearTimeout(spotlightTimer);
+          spotlightTimer = null;
+        }
+
+        const finalize = () => {
+          spotlight.classList.remove("active", "closing");
+          drawnNumbers.push(numToCommit);
+          latestDrawn = numToCommit;
+          renderHistory();
+        };
+
+        if (immediate) {
+          finalize();
+          return;
+        }
+
+        spotlight.classList.add("closing");
+        setTimeout(finalize, 340);
+      }
+
+      function drawNextBall() {
+        if (isSpinning) return;
+
+        if (activeSpotlightNum !== null) {
+          commitSpotlightBall(true);
+        }
+
+        if (balls.length === 0) return;
+
+        isSpinning = true;
+        boostMultiplier = 3.0;
+        drumWrapper.classList.add("spinning");
+
+        balls.forEach((b) => {
+          b.vy -= 3.5 + Math.random() * 3.5;
+          b.vx += (Math.random() - 0.5) * 5.0;
+        });
+
+        setTimeout(() => {
+          const randomIndex = Math.floor(Math.random() * balls.length);
+          const [selected] = balls.splice(randomIndex, 1);
+
+          boostMultiplier = 1;
+          drumWrapper.classList.remove("spinning");
+          isSpinning = false;
+
+          activeSpotlightNum = selected.num;
+          spotlightBall.textContent = selected.num;
+          spotlight.classList.remove("closing");
+          spotlight.classList.add("active");
+
+          if (typeof confetti === "function") {
+            confetti({
+              particleCount: balls.length === 0 ? 120 : 35,
+              spread: balls.length === 0 ? 90 : 55,
+              origin: { y: 0.5 },
+              colors: CONFETTI_COLORS
+            });
+          }
+
+          spotlightTimer = setTimeout(() => {
+            commitSpotlightBall(false);
+          }, SPOTLIGHT_DURATION_MS);
+        }, SPIN_BOOST_MS);
+      }
+
+      window.addEventListener("keydown", (e) => {
+        if (e.code === "Space") {
+          e.preventDefault();
+          drawNextBall();
+        }
+      });
+
+      drumWrapper.addEventListener("click", drawNextBall);
+
+      createBalls();
+      renderHistory();
+      loop();
     });
-
-    drumWrapper.addEventListener("click", drawNextBall);
-
-    createBalls();
-    renderHistory();
-    loop();
   </script>
 </body>
 </html>
