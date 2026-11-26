@@ -21,13 +21,13 @@
       const s = config.secondaryColor || "#ff9900";
       const d = config.darkColor || "#111111";
       config.ballStyles = [
-        { bg1: "#ffffff", bg2: p, bg3: s, text: d },
-        { bg1: "#555555", bg2: "#1f1f1f", bg3: "#050505", text: p },
-        { bg1: "#ffffff", bg2: "#fff6cc", bg3: p, text: d },
-        { bg1: "#ffffff", bg2: p, bg3: "#222222", text: d }
+        { bg1: "#ffd4c8", bg2: "#ff5a3c", bg3: "#c42014", text: "#ffffff" },
+        { bg1: "#555555", bg2: "#1f1f1f", bg3: "#050505", text: "#ff6b4a" },
+        { bg1: "#ffe0d6", bg2: "#ff6f4d", bg3: "#d62818", text: "#ffffff" },
+        { bg1: "#ffd0c4", bg2: "#e8452c", bg3: "#8f1108", text: "#ffffff" }
       ];
-      config.particleColors = [p, "#ffffff", s];
-      config.confettiColors = [p, config.accentColor || "#01afff", "#ffffff", s, d];
+      config.particleColors = ["#ff5a3c", p, "#ffffff"];
+      config.confettiColors = ["#ff5a3c", p, config.accentColor || "#01afff", "#ffffff", s, d];
     }
 
     return config;

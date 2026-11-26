@@ -33,9 +33,9 @@ window.BRAND_CONFIG = {
 
   // Estilos de bolitas dentro de la tómbola
   ballStyles: [
-    { bg1: "#ffffff", bg2: "#ffe96b", bg3: "#f5a600", text: "#111111" },
-    { bg1: "#555555", bg2: "#1f1f1f", bg3: "#050505", text: "#ffd500" },
-    { bg1: "#ffffff", bg2: "#fff3a8", bg3: "#ffd500", text: "#111111" },
-    { bg1: "#fff8d6", bg2: "#ffd500", bg3: "#c77d00", text: "#111111" }
+    { bg1: "#ffd4c8", bg2: "#ff5a3c", bg3: "#c42014", text: "#ffffff" },
+    { bg1: "#555555", bg2: "#1f1f1f", bg3: "#050505", text: "#ff6b4a" },
+    { bg1: "#ffe0d6", bg2: "#ff6f4d", bg3: "#d62818", text: "#ffffff" },
+    { bg1: "#ffd0c4", bg2: "#e8452c", bg3: "#8f1108", text: "#ffffff" }
   ]
 };
