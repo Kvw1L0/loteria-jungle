@@ -355,7 +355,7 @@
       </div>
 
       <div class="actions-grid">
-        <button class="btn btn-primary" type="button" id="applyPreviewBtn">Aplicar y Previsualizar</button>
+        <button class="btn btn-primary" type="button" id="applyPreviewBtn">Guardar y Aplicar</button>
         <button class="btn btn-success" type="button" id="downloadConfigBtn">Descargar brand.config.js</button>
         <button class="btn btn-secondary" type="button" id="copyCardLinkBtn">Copiar link Cartón</button>
         <button class="btn btn-secondary" type="button" id="copyTombolaLinkBtn">Copiar link Tómbola</button>
@@ -452,7 +452,11 @@
 
     function saveConfig() {
       const cfg = readFromForm();
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(cfg));
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(cfg));
+      } catch (err) {
+        showStatus("No se pudo guardar en el navegador (imagen demasiado pesada). Usa una imagen más liviana o una URL.", true);
+      }
       return cfg;
     }
 
@@ -460,18 +464,47 @@
       previewFrame.src = `${activePreviewPage}?t=${Date.now()}`;
     }
 
-    function handleImageUpload(fileInput, targetInput) {
-      fileInput.addEventListener("change", (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
+    function compressImage(file, maxDim, asJpeg) {
+      return new Promise((resolve, reject) => {
         const reader = new FileReader();
+        reader.onerror = reject;
         reader.onload = () => {
-          targetInput.value = reader.result;
-          saveConfig();
-          refreshPreview();
-          showStatus("Imagen cargada en vista previa. Para publicar para todos, usa 'Descargar brand.config.js'.");
+          const img = new Image();
+          img.onerror = () => resolve(reader.result);
+          img.onload = () => {
+            let { width, height } = img;
+            if (width > maxDim || height > maxDim) {
+              const ratio = Math.min(maxDim / width, maxDim / height);
+              width = Math.round(width * ratio);
+              height = Math.round(height * ratio);
+            }
+            const canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, width, height);
+            const mime = asJpeg ? "image/jpeg" : "image/png";
+            resolve(canvas.toDataURL(mime, asJpeg ? 0.82 : undefined));
+          };
+          img.src = reader.result;
         };
         reader.readAsDataURL(file);
+      });
+    }
+
+    function handleImageUpload(fileInput, targetInput, maxDim, asJpeg) {
+      fileInput.addEventListener("change", async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        try {
+          const dataUrl = await compressImage(file, maxDim, asJpeg);
+          targetInput.value = dataUrl;
+          saveConfig();
+          refreshPreview();
+          showStatus("Imagen cargada y guardada en este navegador. Si quieres publicarla para otros dispositivos, usa 'Descargar brand.config.js'.");
+        } catch {
+          showStatus("No se pudo procesar la imagen seleccionada.", true);
+        }
       });
     }
 
@@ -489,11 +522,24 @@
       return `${base}${page}?c=${b64}`;
     }
 
-    handleImageUpload(document.getElementById("logoFile"), fields.logoUrl);
-    handleImageUpload(document.getElementById("backgroundFile"), fields.backgroundUrl);
+    handleImageUpload(document.getElementById("logoFile"), fields.logoUrl, 800, false);
+    handleImageUpload(document.getElementById("backgroundFile"), fields.backgroundUrl, 1600, true);
 
     [fields.primaryColor, fields.secondaryColor, fields.accentColor].forEach((el) => {
       el.addEventListener("input", updateColorLabels);
+    });
+
+    // Auto-save on any form change so edits are never lost
+    let autoSaveTimer = null;
+    Object.values(fields).forEach((el) => {
+      const evt = (el.type === "checkbox" || el.tagName === "SELECT") ? "change" : "input";
+      el.addEventListener(evt, () => {
+        clearTimeout(autoSaveTimer);
+        autoSaveTimer = setTimeout(() => {
+          saveConfig();
+          refreshPreview();
+        }, 280);
+      });
     });
 
     document.getElementById("applyPreviewBtn").addEventListener("click", () => {
