@@ -3,11 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Lotería JUNGLE</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet" />
+  <title>Lotería</title>
+  <script src="brand.config.js"></script>
+  <script src="theme-loader.js"></script>
   <style>
+    :root {
+      --brand-primary: #ffd500;
+      --brand-accent: #01afff;
+      --brand-dark: #111111;
+      --brand-cell-bg: rgba(255, 255, 255, 0.96);
+      --brand-cell-text: #111111;
+      --brand-whatsapp-bg: #25d366;
+      --brand-font: 'Luckiest Guy', cursive;
+      --brand-bg-image: url('fondo-jungle.jpg');
+      --grid-columns: 3;
+    }
+
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
@@ -17,7 +28,7 @@
       margin: 0;
       padding: 0;
       min-height: 100%;
-      font-family: 'Luckiest Guy', cursive;
+      font-family: var(--brand-font);
     }
 
     body {
@@ -27,7 +38,11 @@
       align-items: center;
       justify-content: flex-start;
       padding: clamp(175px, 34vh, 275px) 16px 36px;
-      background: #0d0d0d url('fondo-jungle.jpg') no-repeat center top fixed;
+      background-color: #0d0d0d;
+      background-image: var(--brand-bg-image);
+      background-repeat: no-repeat;
+      background-position: center top;
+      background-attachment: fixed;
       background-size: cover;
       overflow-x: hidden;
     }
@@ -42,7 +57,7 @@
 
     #grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(var(--grid-columns), 1fr);
       gap: 12px;
       width: 100%;
       max-width: 338px;
@@ -52,14 +67,14 @@
     .cell {
       aspect-ratio: 1 / 1;
       width: 100%;
-      background: rgba(255, 255, 255, 0.96);
-      border: 3px solid #111111;
+      background: var(--brand-cell-bg);
+      border: 3px solid var(--brand-dark);
       border-radius: 13px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: clamp(2.06rem, 7.5vw, 2.65rem);
-      color: #111111;
+      color: var(--brand-cell-text);
       cursor: pointer;
       user-select: none;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.55), inset 0 -4px 0 rgba(0, 0, 0, 0.08);
@@ -72,31 +87,31 @@
 
     .cell.marked {
       background: #ffffff;
-      border-color: #01afff;
-      color: #0077b6;
+      border-color: var(--brand-accent);
+      color: var(--brand-accent);
       transform: scale(1.03);
-      box-shadow: 0 0 14px #01afff, 0 0 28px rgba(1, 175, 255, 0.8), 0 8px 20px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 0 14px var(--brand-accent), 0 0 28px var(--brand-accent), 0 8px 20px rgba(0, 0, 0, 0.5);
     }
 
     #whatsappBtn {
       display: none;
       margin-top: 28px;
       padding: 14px 26px;
-      background-color: #25d366;
+      background-color: var(--brand-whatsapp-bg);
       color: #ffffff;
       border: 3px solid #ffffff;
       border-radius: 14px;
-      font-family: 'Luckiest Guy', cursive;
+      font-family: var(--brand-font);
       font-size: 1.25rem;
       letter-spacing: 0.6px;
       cursor: pointer;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
-      transition: transform 0.15s ease, background-color 0.2s ease;
+      transition: transform 0.15s ease, filter 0.2s ease;
       animation: popIn 0.35s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     #whatsappBtn:hover {
-      background-color: #1ebe5b;
+      filter: brightness(0.94);
       transform: translateY(-2px);
     }
 
@@ -118,16 +133,22 @@
 </head>
 <body>
   <main class="card-wrapper">
-    <div id="grid" aria-label="Cartón de lotería de 6 números"></div>
+    <div id="grid" aria-label="Cartón de lotería"></div>
     <button id="whatsappBtn" type="button" onclick="sendWhatsApp()">Enviar por WhatsApp</button>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script>
-    const TOTAL_NUMBERS = 20;
-    const CARD_SIZE = 6;
-    const grid = document.getElementById('grid');
-    const whatsappBtn = document.getElementById('whatsappBtn');
+    const cfg = window.ACTIVE_BRAND_CONFIG || {};
+    const TOTAL_NUMBERS = Number(cfg.totalNumbers) || 20;
+    const CARD_SIZE = Number(cfg.cardSize) || 6;
+    const GRID_COLUMNS = Number(cfg.gridColumns) || 3;
+
+    document.title = `Lotería ${cfg.brandName || ""}`.trim();
+    document.documentElement.style.setProperty("--grid-columns", String(GRID_COLUMNS));
+
+    const grid = document.getElementById("grid");
+    const whatsappBtn = document.getElementById("whatsappBtn");
 
     function generateUniqueRandomNumbers(max, count) {
       const pool = Array.from({ length: max }, (_, i) => i + 1);
@@ -135,51 +156,51 @@
         const j = Math.floor(Math.random() * (i + 1));
         [pool[i], pool[j]] = [pool[j], pool[i]];
       }
-      return pool.slice(0, count);
+      return pool.slice(0, Math.min(count, max));
     }
 
     const cardNumbers = generateUniqueRandomNumbers(TOTAL_NUMBERS, CARD_SIZE);
     let confettiFired = false;
 
     function checkCompletion() {
-      const cells = grid.querySelectorAll('.cell');
-      const markedCount = grid.querySelectorAll('.cell.marked').length;
+      const cells = grid.querySelectorAll(".cell");
+      const markedCount = grid.querySelectorAll(".cell.marked").length;
       const isComplete = markedCount === cells.length;
 
       if (isComplete) {
-        whatsappBtn.style.display = 'block';
-        if (!confettiFired && typeof confetti === 'function') {
+        whatsappBtn.style.display = "block";
+        if (!confettiFired && typeof confetti === "function") {
           confettiFired = true;
           confetti({
             particleCount: 110,
             spread: 80,
             origin: { y: 0.6 },
-            colors: ['#ffd500', '#01afff', '#ffffff', '#25d366', '#111111']
+            colors: cfg.confettiColors || ["#ffd500", "#01afff", "#ffffff", "#25d366", "#111111"]
           });
         }
       } else {
-        whatsappBtn.style.display = 'none';
+        whatsappBtn.style.display = "none";
         confettiFired = false;
       }
     }
 
     cardNumbers.forEach((num) => {
-      const cell = document.createElement('div');
-      cell.className = 'cell';
+      const cell = document.createElement("div");
+      cell.className = "cell";
       cell.textContent = num;
-      cell.setAttribute('role', 'button');
-      cell.setAttribute('tabindex', '0');
-      cell.setAttribute('aria-pressed', 'false');
+      cell.setAttribute("role", "button");
+      cell.setAttribute("tabindex", "0");
+      cell.setAttribute("aria-pressed", "false");
 
       const toggleCell = () => {
-        const marked = cell.classList.toggle('marked');
-        cell.setAttribute('aria-pressed', String(marked));
+        const marked = cell.classList.toggle("marked");
+        cell.setAttribute("aria-pressed", String(marked));
         checkCompletion();
       };
 
-      cell.addEventListener('click', toggleCell);
-      cell.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
+      cell.addEventListener("click", toggleCell);
+      cell.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
           toggleCell();
         }
@@ -189,9 +210,11 @@
     });
 
     function sendWhatsApp() {
-      const message = `¡LOTERÍA JUNGLE! Completé mi cartón con los números: ${cardNumbers.join(', ')}`;
-      const url = `https://wa.me/56986532423?text=${encodeURIComponent(message)}`;
-      window.open(url, '_blank', 'noopener,noreferrer');
+      const phone = String(cfg.whatsappPhone || "56986532423").replace(/\D/g, "");
+      const template = cfg.whatsappMessage || "¡LOTERÍA! Completé mi cartón con los números: {numbers}";
+      const message = template.replace("{numbers}", cardNumbers.join(", "));
+      const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+      window.open(url, "_blank", "noopener,noreferrer");
     }
   </script>
 </body>

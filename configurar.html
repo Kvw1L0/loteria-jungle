@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Configurador White-Label — Lotería &amp; Tómbola</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="brand.config.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: #0d0f14;
+      color: #eef1f6;
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 18px 28px;
+      background: #141821;
+      border-bottom: 1px solid #242a38;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    header p {
+      margin: 2px 0 0;
+      font-size: 0.85rem;
+      color: #9ba3b4;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(340px, 460px) 1fr;
+      gap: 24px;
+      padding: 24px 28px;
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 980px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel {
+      background: #141821;
+      border: 1px solid #242a38;
+      border-radius: 16px;
+      padding: 20px;
+    }
+
+    .section-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #8b95a8;
+      margin: 18px 0 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #242a38;
+    }
+
+    .section-title:first-child {
+      margin-top: 0;
+    }
+
+    .field {
+      margin-bottom: 12px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.84rem;
+      font-weight: 600;
+      margin-bottom: 5px;
+      color: #d6dce8;
+    }
+
+    .field input[type="text"],
+    .field input[type="number"],
+    .field select,
+    .field textarea {
+      width: 100%;
+      background: #0d1017;
+      border: 1px solid #2c3344;
+      border-radius: 9px;
+      padding: 9px 11px;
+      color: #ffffff;
+      font-size: 0.9rem;
+      font-family: inherit;
+    }
+
+    .field input[type="file"] {
+      width: 100%;
+      font-size: 0.82rem;
+      color: #9ba3b4;
+      margin-top: 5px;
+    }
+
+    .row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .row-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+    }
+
+    .color-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #0d1017;
+      border: 1px solid #2c3344;
+      border-radius: 9px;
+      padding: 5px 9px;
+    }
+
+    .color-box input[type="color"] {
+      width: 30px;
+      height: 28px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .color-box span {
+      font-size: 0.82rem;
+      font-family: monospace;
+      color: #c7d0e0;
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: #c7d0e0;
+      margin-top: 6px;
+      cursor: pointer;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 15px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.12s ease, opacity 0.15s ease;
+      font-family: inherit;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-primary {
+      background: #ffd500;
+      color: #111111;
+    }
+
+    .btn-secondary {
+      background: #232a3a;
+      color: #ffffff;
+      border: 1px solid #353f55;
+    }
+
+    .btn-success {
+      background: #25d366;
+      color: #091d10;
+    }
+
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.14);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.35);
+    }
+
+    .actions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .status-msg {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 9px;
+      font-size: 0.83rem;
+      background: rgba(37, 211, 102, 0.12);
+      border: 1px solid rgba(37, 211, 102, 0.35);
+      color: #86efac;
+      display: none;
+    }
+
+    .status-msg.warn {
+      background: rgba(250, 204, 21, 0.12);
+      border-color: rgba(250, 204, 21, 0.35);
+      color: #fde047;
+    }
+
+    /* Live Preview Side */
+    .preview-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .preview-frame-wrap {
+      position: relative;
+      width: 100%;
+      height: 700px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid #2c3344;
+      background: #000000;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Configurador White-Label</h1>
+      <p>Personaliza logo, fondo, colores, tipografía y WhatsApp sin tocar código.</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-secondary" type="button" id="openCardBtn">Abrir Cartón</button>
+      <button class="btn btn-secondary" type="button" id="openTombolaBtn">Abrir Tómbola</button>
+      <button class="btn btn-danger" type="button" id="resetDefaultBtn">Restaurar JUNGLE</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="panel">
+      <div class="section-title">1. Identidad de Marca</div>
+
+      <div class="field">
+        <label for="brandName">Nombre de la marca</label>
+        <input type="text" id="brandName" placeholder="Ej: Mi Marca" />
+      </div>
+
+      <div class="field">
+        <label for="logoUrl">Logo (URL o sube archivo PNG/SVG)</label>
+        <input type="text" id="logoUrl" placeholder="logo-jungle.png o https://..." />
+        <input type="file" id="logoFile" accept="image/*" />
+        <label class="checkbox-row">
+          <input type="checkbox" id="logoOutline" />
+          <span>Agregar contorno del color principal alrededor del logo</span>
+        </label>
+      </div>
+
+      <div class="field">
+        <label for="backgroundUrl">Imagen de fondo (URL o sube archivo)</label>
+        <input type="text" id="backgroundUrl" placeholder="fondo-jungle.jpg o https://..." />
+        <input type="file" id="backgroundFile" accept="image/*" />
+      </div>
+
+      <div class="section-title">2. Colores y Tipografía</div>
+
+      <div class="row-3">
+        <div class="field">
+          <label>Principal</label>
+          <div class="color-box">
+            <input type="color" id="primaryColor" />
+            <span id="primaryHex"></span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Secundario</label>
+          <div class="color-box">
+            <input type="color" id="secondaryColor" />
+            <span id="secondaryHex"></span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Marcado</label>
+          <div class="color-box">
+            <input type="color" id="accentColor" />
+            <span id="accentHex"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="fontFamily">Tipografía (Google Fonts)</label>
+        <select id="fontFamily">
+          <option value="Luckiest Guy">Luckiest Guy</option>
+          <option value="Anton">Anton</option>
+          <option value="Bebas Neue">Bebas Neue</option>
+          <option value="Bangers">Bangers</option>
+          <option value="Montserrat">Montserrat</option>
+          <option value="Poppins">Poppins</option>
+        </select>
+      </div>
+
+      <div class="section-title">3. Reglas y WhatsApp</div>
+
+      <div class="row-3">
+        <div class="field">
+          <label for="totalNumbers">Números (1..N)</label>
+          <input type="number" id="totalNumbers" min="6" max="90" />
+        </div>
+        <div class="field">
+          <label for="cardSize">Casillas</label>
+          <input type="number" id="cardSize" min="3" max="24" />
+        </div>
+        <div class="field">
+          <label for="gridColumns">Columnas</label>
+          <input type="number" id="gridColumns" min="1" max="6" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="whatsappPhone">Número de WhatsApp (con código de país)</label>
+        <input type="text" id="whatsappPhone" placeholder="56986532423" />
+      </div>
+
+      <div class="field">
+        <label for="whatsappMessage">Mensaje de WhatsApp ({numbers} = números del cartón)</label>
+        <textarea id="whatsappMessage" rows="2"></textarea>
+      </div>
+
+      <div class="actions-grid">
+        <button class="btn btn-primary" type="button" id="applyPreviewBtn">Aplicar y Previsualizar</button>
+        <button class="btn btn-success" type="button" id="downloadConfigBtn">Descargar brand.config.js</button>
+        <button class="btn btn-secondary" type="button" id="copyCardLinkBtn">Copiar link Cartón</button>
+        <button class="btn btn-secondary" type="button" id="copyTombolaLinkBtn">Copiar link Tómbola</button>
+      </div>
+
+      <div class="status-msg" id="statusMsg"></div>
+    </section>
+
+    <section class="panel">
+      <div class="preview-tabs">
+        <button class="btn btn-primary" type="button" id="tabCardBtn">Vista previa: Cartón</button>
+        <button class="btn btn-secondary" type="button" id="tabTombolaBtn">Vista previa: Tómbola</button>
+      </div>
+      <div class="preview-frame-wrap">
+        <iframe id="previewFrame" src="index.html" title="Vista previa"></iframe>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const STORAGE_KEY = "whitelabel_brand_config_v1";
+    const defaultCfg = Object.assign({}, window.BRAND_CONFIG || {});
+    let activePreviewPage = "index.html";
+
+    const fields = {
+      brandName: document.getElementById("brandName"),
+      logoUrl: document.getElementById("logoUrl"),
+      logoOutline: document.getElementById("logoOutline"),
+      backgroundUrl: document.getElementById("backgroundUrl"),
+      primaryColor: document.getElementById("primaryColor"),
+      secondaryColor: document.getElementById("secondaryColor"),
+      accentColor: document.getElementById("accentColor"),
+      fontFamily: document.getElementById("fontFamily"),
+      totalNumbers: document.getElementById("totalNumbers"),
+      cardSize: document.getElementById("cardSize"),
+      gridColumns: document.getElementById("gridColumns"),
+      whatsappPhone: document.getElementById("whatsappPhone"),
+      whatsappMessage: document.getElementById("whatsappMessage")
+    };
+
+    const statusMsg = document.getElementById("statusMsg");
+    const previewFrame = document.getElementById("previewFrame");
+
+    function showStatus(text, isWarn = false) {
+      statusMsg.textContent = text;
+      statusMsg.classList.toggle("warn", isWarn);
+      statusMsg.style.display = "block";
+    }
+
+    function updateColorLabels() {
+      document.getElementById("primaryHex").textContent = fields.primaryColor.value;
+      document.getElementById("secondaryHex").textContent = fields.secondaryColor.value;
+      document.getElementById("accentHex").textContent = fields.accentColor.value;
+    }
+
+    function loadIntoForm(cfg) {
+      fields.brandName.value = cfg.brandName || "";
+      fields.logoUrl.value = cfg.logoUrl || "";
+      fields.logoOutline.checked = cfg.logoOutline !== false;
+      fields.backgroundUrl.value = cfg.backgroundUrl || "";
+      fields.primaryColor.value = cfg.primaryColor || "#ffd500";
+      fields.secondaryColor.value = cfg.secondaryColor || "#ff9900";
+      fields.accentColor.value = cfg.accentColor || "#01afff";
+      fields.fontFamily.value = cfg.fontFamily || "Luckiest Guy";
+      fields.totalNumbers.value = cfg.totalNumbers || 20;
+      fields.cardSize.value = cfg.cardSize || 6;
+      fields.gridColumns.value = cfg.gridColumns || 3;
+      fields.whatsappPhone.value = cfg.whatsappPhone || "";
+      fields.whatsappMessage.value = cfg.whatsappMessage || "";
+      updateColorLabels();
+    }
+
+    function readFromForm() {
+      return {
+        brandName: fields.brandName.value.trim() || "Mi Marca",
+        logoUrl: fields.logoUrl.value.trim(),
+        logoOutline: fields.logoOutline.checked,
+        backgroundUrl: fields.backgroundUrl.value.trim(),
+        primaryColor: fields.primaryColor.value,
+        secondaryColor: fields.secondaryColor.value,
+        accentColor: fields.accentColor.value,
+        darkColor: "#111111",
+        cellBgColor: "rgba(255, 255, 255, 0.96)",
+        cellTextColor: "#111111",
+        whatsappBgColor: "#25d366",
+        fontFamily: fields.fontFamily.value,
+        totalNumbers: Math.max(6, Number(fields.totalNumbers.value) || 20),
+        cardSize: Math.max(1, Number(fields.cardSize.value) || 6),
+        gridColumns: Math.max(1, Number(fields.gridColumns.value) || 3),
+        whatsappPhone: fields.whatsappPhone.value.trim(),
+        whatsappMessage: fields.whatsappMessage.value.trim()
+      };
+    }
+
+    function saveConfig() {
+      const cfg = readFromForm();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(cfg));
+      return cfg;
+    }
+
+    function refreshPreview() {
+      previewFrame.src = `${activePreviewPage}?t=${Date.now()}`;
+    }
+
+    function handleImageUpload(fileInput, targetInput) {
+      fileInput.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          targetInput.value = reader.result;
+          saveConfig();
+          refreshPreview();
+          showStatus("Imagen cargada en vista previa. Para publicar para todos, usa 'Descargar brand.config.js'.");
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function encodeConfigToUrl(page, cfg) {
+      const json = JSON.stringify(cfg);
+      if (json.length > 6000) {
+        showStatus("Las imágenes subidas como archivo son muy grandes para un link. Usa URLs de imagen o descarga 'brand.config.js'.", true);
+        return null;
+      }
+      const bytes = new TextEncoder().encode(json);
+      let bin = "";
+      bytes.forEach((b) => { bin += String.fromCharCode(b); });
+      const b64 = btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+      const base = window.location.href.replace(/configurar\.html.*$/, "");
+      return `${base}${page}?c=${b64}`;
+    }
+
+    handleImageUpload(document.getElementById("logoFile"), fields.logoUrl);
+    handleImageUpload(document.getElementById("backgroundFile"), fields.backgroundUrl);
+
+    [fields.primaryColor, fields.secondaryColor, fields.accentColor].forEach((el) => {
+      el.addEventListener("input", updateColorLabels);
+    });
+
+    document.getElementById("applyPreviewBtn").addEventListener("click", () => {
+      saveConfig();
+      refreshPreview();
+      showStatus("Configuración aplicada a la vista previa y guardada en este navegador.");
+    });
+
+    document.getElementById("downloadConfigBtn").addEventListener("click", () => {
+      const cfg = saveConfig();
+      const content = `// Configuración de marca generada desde configurar.html\nwindow.BRAND_CONFIG = ${JSON.stringify(cfg, null, 2)};\n`;
+      const blob = new Blob([content], { type: "application/javascript;charset=utf-8" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "brand.config.js";
+      a.click();
+      URL.revokeObjectURL(a.href);
+      showStatus("Archivo brand.config.js descargado. Reemplázalo en el proyecto para publicar tu marca.");
+    });
+
+    document.getElementById("copyCardLinkBtn").addEventListener("click", async () => {
+      const cfg = saveConfig();
+      const url = encodeConfigToUrl("index.html", cfg);
+      if (!url) return;
+      await navigator.clipboard.writeText(url);
+      showStatus("Enlace compartible del Cartón copiado al portapapeles.");
+    });
+
+    document.getElementById("copyTombolaLinkBtn").addEventListener("click", async () => {
+      const cfg = saveConfig();
+      const url = encodeConfigToUrl("tombola.html", cfg);
+      if (!url) return;
+      await navigator.clipboard.writeText(url);
+      showStatus("Enlace compartible de la Tómbola copiado al portapapeles.");
+    });
+
+    document.getElementById("openCardBtn").addEventListener("click", () => {
+      saveConfig();
+      window.open("index.html", "_blank");
+    });
+
+    document.getElementById("openTombolaBtn").addEventListener("click", () => {
+      saveConfig();
+      window.open("tombola.html", "_blank");
+    });
+
+    document.getElementById("resetDefaultBtn").addEventListener("click", () => {
+      localStorage.removeItem(STORAGE_KEY);
+      loadIntoForm(defaultCfg);
+      refreshPreview();
+      showStatus("Marca restaurada a JUNGLE por defecto.");
+    });
+
+    document.getElementById("tabCardBtn").addEventListener("click", () => {
+      activePreviewPage = "index.html";
+      document.getElementById("tabCardBtn").className = "btn btn-primary";
+      document.getElementById("tabTombolaBtn").className = "btn btn-secondary";
+      refreshPreview();
+    });
+
+    document.getElementById("tabTombolaBtn").addEventListener("click", () => {
+      activePreviewPage = "tombola.html";
+      document.getElementById("tabTombolaBtn").className = "btn btn-primary";
+      document.getElementById("tabCardBtn").className = "btn btn-secondary";
+      refreshPreview();
+    });
+
+    // Init form from saved config or default
+    let initialCfg = defaultCfg;
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) initialCfg = Object.assign({}, defaultCfg, JSON.parse(saved));
+    } catch {}
+    loadIntoForm(initialCfg);
+  </script>
+</body>
+</html>
